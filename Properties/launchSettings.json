@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "AudioShittifier": {
+      "commandName": "Project",
+      "commandLineArgs": "\"source=D:\\Workstations\\Content\\Video\\Projects\\10h relaxing music\\Unmodified Audio\" \"destination=D:\\Workstations\\Content\\Video\\Projects\\10h relaxing music\\Modified Audio\" intensity=0.8"
+    }
+  }
+}
