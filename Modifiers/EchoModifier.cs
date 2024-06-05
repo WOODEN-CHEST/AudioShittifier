@@ -11,19 +11,22 @@ public class EchoModifier : IAudioModifier
 {
     // Fields.
     public TimeSpan Offset { get; set; }
-
+    public float EchoVolume { get; set; } = 1f;
 
 
     // Inherited methods.
-    public void Modify(float[] samples, WaveFormat audioFormat)
+    public void Modify(SampleBuffer buffer)
     {
-        float[] SampleCopies = new float[samples.Length];
-        Buffer.BlockCopy(samples, 0, SampleCopies, 0, samples.Length * sizeof(float));
+        SampleBuffer CopyBuffer = new(buffer.GetCopyOfSamples(), buffer.Format);
 
-        int SampleOffset = (int)(Offset.TotalSeconds * audioFormat.SampleRate * audioFormat.Channels);
-        for (int i = Math.Max(0, -SampleOffset); (i < samples.Length) && (i + SampleOffset) < samples.Length; i++)
+        int SampleOffset = (int)(Offset.TotalSeconds * buffer.Format.SampleRate);
+        for (int i = Math.Max(0, SampleOffset); Math.Max(i, i - SampleOffset) < buffer.LengthPerChannel; i++)
         {
-            samples[i] = Math.Clamp(samples[i] + SampleCopies[i + SampleOffset], -1f, 1f);
+            for (int ChannelIndex = 0; ChannelIndex < buffer.Format.Channels; ChannelIndex++)
+            {
+                buffer.SetSample(i, ChannelIndex, CopyBuffer.GetSample(i, ChannelIndex) 
+                    + CopyBuffer.GetSample(i - SampleOffset, ChannelIndex) * EchoVolume);
+            }
         }
     }
 }

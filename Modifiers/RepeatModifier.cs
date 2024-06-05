@@ -1,4 +1,5 @@
-﻿using NAudio.Wave;
+﻿using AudioShittifier.Audio;
+using NAudio.Wave;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,12 +12,14 @@ public class RepeatModifier : IAudioModifier
 {
     // Fields.
     public double RepeatChancePerSecond { get; set; }
-    public TimeSpan AverageRepeatSectionDuration { get; set; }
-    public int AverageRepeatCount { get; set; }
+    public TimeSpan RepeatLengthMin { get; set; }
+    public TimeSpan RepeatLengthMax { get; set; }
+    public int RepeatCountMin { get; set; }
+    public int RepeatCountMax { get; set; }
 
 
     // Private methods.
-    private void CopySamples(float[] samples, int sourceIndex, int destinationIndex, int count)
+    private void CopySamples(SampleBuffer buffer, int sourceIndex, int destinationIndex, int count)
     {
         int Offset = destinationIndex - sourceIndex;
         if (destinationIndex - Offset < 0)
@@ -24,32 +27,36 @@ public class RepeatModifier : IAudioModifier
             throw new ArgumentException("destination index and source index create offset which is out of bounds.",
                 nameof(destinationIndex));
         }
-        for (int i = destinationIndex; (i < destinationIndex + count) && (i < samples.Length); i++)
+        for (int i = destinationIndex; (i < destinationIndex + count) && (i < buffer.Samples.Length); i++)
         {
-            samples[i] = samples[i - Offset];
+            for (int ChannelIndex = 0; ChannelIndex < buffer.Format.Channels; ChannelIndex++)
+            {
+                buffer.SetSample(i, ChannelIndex, buffer.Samples[i - Offset]);
+            }
         }
     }
 
 
     // Inherited methods.
-    public void Modify(float[] samples, WaveFormat audioFormat)
+    public void Modify(SampleBuffer buffer)
     {
-        for (int Index = 0; Index < samples.Length; Index += audioFormat.SampleRate * audioFormat.Channels)
+        for (int Index = 0; Index < buffer.LengthPerChannel; Index += buffer.Format.SampleRate)
         {
             if (Random.Shared.NextDouble() >= RepeatChancePerSecond)
             {
                 continue;
             }
-            
-            int RepeatCount = (int)ShittifierRandom.RandomOffsetValue(AverageRepeatCount);
-            int RepeatedSamples = (int)(ShittifierRandom.RandomOffsetValue(AverageRepeatSectionDuration.TotalSeconds)
-                * audioFormat.SampleRate * audioFormat.Channels);
+
+            int RepeatCount = Random.Shared.Next(RepeatCountMin, RepeatCountMax + 1);
+            int SamplesInSegment = (int)(RepeatLengthMin.TotalSeconds + 
+                (RepeatLengthMax - RepeatLengthMin).TotalSeconds * Random.Shared.NextDouble() * buffer.Format.SampleRate);
             int SourceIndex = Index;
-            Index += RepeatedSamples;
+            Index += SamplesInSegment;
+
             for (int RepeatIndex = 0; RepeatIndex < RepeatCount; RepeatIndex++)
             {
-                CopySamples(samples, SourceIndex, Index, RepeatedSamples);
-                Index += RepeatedSamples;
+                CopySamples(buffer, SourceIndex, Index, SamplesInSegment);
+                Index += SamplesInSegment;
             }
         }
     }

@@ -13,33 +13,34 @@ internal class BiQuadFilterModifier : IAudioModifier
     // Fields.
     public int Frequency { get; set; } = 2000;
     public BiQualFilterPassType PassType { get; set; } = BiQualFilterPassType.HighPass;
+    public int FilterOrder { get; set; } = 3;
 
 
     // Inherited methods.
-    public void Modify(float[] samples, WaveFormat audioFormat)
+    public void Modify(SampleBuffer buffer)
     {
-        NAudio.Dsp.BiQuadFilter[] Filters = new NAudio.Dsp.BiQuadFilter[audioFormat.Channels];
+        BiQuadFilter[] Filters = new BiQuadFilter[buffer.Format.Channels];
         for (int i = 0; i < Filters.Length; i++)
         {
             Filters[i] = PassType switch
             {
-                BiQualFilterPassType.HighPass => NAudio.Dsp.BiQuadFilter.HighPassFilter(
-                audioFormat.SampleRate, Math.Min(Frequency, audioFormat.SampleRate / 2), 3),
+                BiQualFilterPassType.HighPass => BiQuadFilter.HighPassFilter(
+                buffer.Format.SampleRate, Math.Min(Frequency, buffer.Format.SampleRate / 2), FilterOrder),
 
-                BiQualFilterPassType.LowPass => NAudio.Dsp.BiQuadFilter.LowPassFilter(
-                audioFormat.SampleRate, Math.Min(Frequency, audioFormat.SampleRate / 2), 3),
+                BiQualFilterPassType.LowPass => BiQuadFilter.LowPassFilter(
+                buffer.Format.SampleRate, Math.Min(Frequency, buffer.Format.SampleRate / 2), FilterOrder),
 
                 _ => throw new ArgumentException($"Invalid filter pass type \"{PassType}\" ({(int)PassType})",
                 nameof(PassType))
             };
         }
 
-        for (int SampleIndex = 0; SampleIndex < samples.Length; SampleIndex += Filters.Length)
+        for (int SampleIndex = 0; SampleIndex < buffer.LengthPerChannel; SampleIndex++)
         {
-            for (int FilterIndex = 0; FilterIndex < Filters.Length; FilterIndex++)
+            for (int ChannelIndex = 0; ChannelIndex < Filters.Length; ChannelIndex++)
             {
-                float Sample = samples[SampleIndex + FilterIndex];
-                samples[SampleIndex + FilterIndex] = Filters[FilterIndex].Transform(Sample);
+                float Sample = buffer.GetSample(SampleIndex, ChannelIndex);
+                buffer.SetSample(SampleIndex, ChannelIndex, Filters[ChannelIndex].Transform(Sample));
             }
         }
     }

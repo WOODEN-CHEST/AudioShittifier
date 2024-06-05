@@ -1,7 +1,10 @@
 ﻿
+using AudioShittifier.Audio;
+using AudioShittifier.Audio.Modifiers;
 using AudioShittifier.Modifiers;
 using NAudio.MediaFoundation;
 using NAudio.Wave;
+using System.Collections.Concurrent;
 using System.Reflection.PortableExecutable;
 
 namespace AudioShittifier;
@@ -35,7 +38,6 @@ public static class WCAudioShittifier
         {
             string Destination = Path.Combine(arguments.DestinationFilePath, Path.GetFileName(AllFilePaths[i]));
             ShittifySingleFile(AllFilePaths[i], Destination, arguments.Intensity);
-
             Console.WriteLine($"Shittified file \"{AllFilePaths[i]}\". " +
                 $"({((float)(i + 1) / AllFilePaths.Length * 100f).ToString("0.00")}% done)");
         }
@@ -90,7 +92,7 @@ public static class WCAudioShittifier
         }
         if (ShittifierRandom.TryWithChance(0.2d, intensity))
         {
-            Modifiers.Add(new SineWaveSoundModifier()
+            Modifiers.Add(new WaveformModifier()
             {
                 ChancePerSecond = ShittifierRandom.RandomNumberWithIntensity(0.001, 0.4, intensity),
                 AverageSectionDuration = TimeSpan.FromMilliseconds(Random.Shared.Next(0, 2000)),
@@ -98,10 +100,10 @@ public static class WCAudioShittifier
         }
         if (ShittifierRandom.TryWithChance(8d, intensity))
         {
-            Modifiers.Add(new EarrapeModifier()
+            Modifiers.Add(new SampleMultiplier()
             {
-                Multiplier = (int)ShittifierRandom.RandomNumberWithIntensity(1, 10, intensity),
-                ClippingThreshold = (float)ShittifierRandom.RandomNumberWithIntensity(10, 2, intensity)
+                Multiplier = (int)ShittifierRandom.RandomNumberWithIntensity(1, 20, intensity),
+                ClippingThreshold = (float)ShittifierRandom.RandomNumberWithIntensity(5, 1.5, intensity)
             });
         }
         if (ShittifierRandom.TryWithChance(0.5d, intensity))
@@ -111,13 +113,16 @@ public static class WCAudioShittifier
         }
         if (ShittifierRandom.TryWithChance(4d, intensity))
         {
-            Modifiers.Add(new BitDepthModifier()
+            Modifiers.Add(new PrecisionModifier()
             { BitDepth = (int)ShittifierRandom.RandomNumberWithIntensity(32, 2, intensity) });
         }
         if (ShittifierRandom.TryWithChance(8d, intensity))
         {
-            Modifiers.Add(new PixelateResampleModifier()
-            { SampleRate = (int)ShittifierRandom.RandomNumberWithIntensity(44100, 200, intensity) });
+            Modifiers.Add(new ResampleModifier()
+            {
+                SampleRate = (int)ShittifierRandom.RandomNumberWithIntensity(44100, 200, intensity),
+                Type = ResampleModifierType.Old
+            });
         }
 
         return new Shittifier(Modifiers.ToArray());

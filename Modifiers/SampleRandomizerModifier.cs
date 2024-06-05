@@ -14,16 +14,22 @@ public class SampleRandomizerModifier : IAudioModifier
 
 
     // Inherited methods.
-    public void Modify(float[] samples, WaveFormat audioFormat)
+    public void Modify(SampleBuffer buffer)
     {
-        int SamplesRandomized = (int)(samples.Length * PortionOfSamplesRandomized);
+        int SamplesRandomized = (int)(buffer.LengthPerChannel * PortionOfSamplesRandomized);
 
         for (int i = 0; i < SamplesRandomized; i++)
         {
-            int Index1 = Random.Shared.Next(0, samples.Length);
-            int Index2 = Random.Shared.Next(0, samples.Length);
+            int Index1 = Random.Shared.Next(0, buffer.LengthPerChannel);
+            int Index2 = Random.Shared.Next(0, buffer.LengthPerChannel);
 
-            (samples[Index1], samples[Index2]) = (samples[Index2], samples[Index1]);
+            for (int ChannelIndex = 0; ChannelIndex < buffer.Format.Channels; ChannelIndex++)
+            {
+                float SampleA = buffer.GetSample(Index1, ChannelIndex);
+                float SampleB = buffer.GetSample(Index1, ChannelIndex);
+                buffer.SetSample(Index1, ChannelIndex, SampleB);
+                buffer.SetSample(Index2, ChannelIndex, SampleA);
+            }
         }
     }
 }

@@ -11,4 +11,10 @@
     <PackageReference Include="NAudio" Version="2.2.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="GHEngine">
+      <HintPath>..\..\GHEngine\GHEngine\bin\Release\net7.0\GHEngine.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

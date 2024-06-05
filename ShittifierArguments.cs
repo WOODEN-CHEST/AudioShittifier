@@ -13,12 +13,14 @@ public record class ShittifierArguments
     public const string ARG_SOURCE = "source";
     public const string ARG_DEST = "destination";
     public const string ARG_INTENSITY = "intensity";
+    public const string ARG_LAYOUT = "layout";
 
 
     // Fields.
     public string SourceFilePath { get; private set; }
     public string DestinationFilePath { get; private set; }
     public float Intensity { get; private set; } = 0.2f;
+    public string? LayoutPath { get; private set; } = null;
 
 
     // Constructors.
@@ -57,6 +59,7 @@ public record class ShittifierArguments
     // Private methods.
     private void ParseArguments(string[] args)
     {
+        HashSet<string> ParsedValues = new();
         foreach (string Argument in args)
         {
             string[] KeyValuePair = Argument.Split('=');
@@ -64,26 +67,42 @@ public record class ShittifierArguments
             {
                 throw new ShittifierArgumentException($"Invalid argument: \"{Argument}\"");
             }
+            if (ParsedValues.Contains(KeyValuePair[0]))
+            {
+                throw new ShittifierArgumentException($"Duplicate argument \"{KeyValuePair[0]}\"");
+            }
 
-            if (KeyValuePair[0] == ARG_SOURCE)
-            {
-                SourceFilePath = KeyValuePair[1];
-            }
-            else if (KeyValuePair[0] == ARG_DEST)
-            {
-                DestinationFilePath = KeyValuePair[1];
-            }
-            else if (KeyValuePair[0] == ARG_INTENSITY)
-            {
-                if (float.TryParse(KeyValuePair[1], CultureInfo.InvariantCulture, out float Result))
+            ParseSingleArgument(KeyValuePair[0], KeyValuePair[1]);
+            ParsedValues.Add(KeyValuePair[0]);
+        }
+    }
+
+    private void ParseSingleArgument(string key, string value)
+    {
+        switch (key)
+        {
+            case ARG_SOURCE:
+                SourceFilePath = value;
+                break;
+
+            case ARG_DEST:
+                DestinationFilePath = value;
+                break;
+
+            case ARG_INTENSITY:
+                if (float.TryParse(key, CultureInfo.InvariantCulture, out float Result))
                 {
                     Intensity = Result;
                 }
                 else
                 {
-                    throw new ShittifierArgumentException($"Expected number for intensity: \"{Argument}\"");
+                    throw new ShittifierArgumentException($"Expected number for intensity: \"{value}\"");
                 }
-            }
+                break;
+
+            case ARG_LAYOUT:
+                LayoutPath = value;
+                break;
         }
     }
 }
