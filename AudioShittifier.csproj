@@ -8,12 +8,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Modifiers\Layout\**" />
+    <EmbeddedResource Remove="Modifiers\Layout\**" />
+    <None Remove="Modifiers\Layout\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="NAudio" Version="2.2.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="GHEngine">
-      <HintPath>..\..\GHEngine\GHEngine\bin\Release\net7.0\GHEngine.dll</HintPath>
+    <Reference Include="GHEngineJSON">
+      <HintPath>..\..\JSON\C#\CSharpWCJson\CSharpWCJson\bin\Release\net7.0\GHEngineJSON.dll</HintPath>
     </Reference>
   </ItemGroup>
 

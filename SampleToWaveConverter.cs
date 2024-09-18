@@ -69,11 +69,7 @@ public class SampleToWaveConverter : IWaveProvider
         int Index;
         for (Index = offset; (Index < count + offset) && (_sampleIndex < _samples.Length); Index += 4, _sampleIndex++)
         {
-            byte[] Bytes = BitConverter.GetBytes(_samples[_sampleIndex]);
-            buffer[Index] = Bytes[0];
-            buffer[Index + 1] = Bytes[1];
-            buffer[Index + 2] = Bytes[2];
-            buffer[Index + 3] = Bytes[3];
+            Buffer.BlockCopy(BitConverter.GetBytes(_samples[_sampleIndex]), 0, buffer, Index, sizeof(float));
         }
         return Index - offset;
     }

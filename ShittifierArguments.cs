@@ -18,7 +18,7 @@ public record class ShittifierArguments
 
     // Fields.
     public string SourceFilePath { get; private set; }
-    public string DestinationFilePath { get; private set; }
+    public string DestinationDirectory { get; private set; }
     public float Intensity { get; private set; } = 0.2f;
     public string? LayoutPath { get; private set; } = null;
 
@@ -36,23 +36,6 @@ public record class ShittifierArguments
         {
             throw new ShittifierArgumentException($"Missing source directory.");
         }
-        if (!Path.IsPathFullyQualified(SourceFilePath))
-        {
-            throw new ShittifierArgumentException($"Source directory path is not fully qualified.");
-        }
-        if (!Directory.Exists(SourceFilePath))
-        {
-            throw new ShittifierArgumentException($"Source directory does not exist.");
-        }
-        if (DestinationFilePath == null)
-        {
-            DestinationFilePath = Path.Combine(Path.GetDirectoryName(SourceFilePath) ?? string.Empty, "out");
-        }
-        if (!Path.IsPathFullyQualified(DestinationFilePath))
-        {
-            throw new ShittifierArgumentException($"'Destination file path is not fully qualified.");
-        }
-        Directory.CreateDirectory(DestinationFilePath);
     }
 
 
@@ -86,11 +69,11 @@ public record class ShittifierArguments
                 break;
 
             case ARG_DEST:
-                DestinationFilePath = value;
+                DestinationDirectory = value;
                 break;
 
             case ARG_INTENSITY:
-                if (float.TryParse(key, CultureInfo.InvariantCulture, out float Result))
+                if (float.TryParse(value, CultureInfo.InvariantCulture, out float Result))
                 {
                     Intensity = Result;
                 }

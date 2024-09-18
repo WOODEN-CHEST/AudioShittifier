@@ -2,7 +2,7 @@
   "profiles": {
     "AudioShittifier": {
       "commandName": "Project",
-      "commandLineArgs": "\"source=C:\\Users\\User\\Desktop\\test\" intensity=0.8"
+      "commandLineArgs": "\"source=C:\\Users\\User\\Desktop\\test\" intensity=0.8 \"layout=\"C:\\Users\\User\\Desktop\\modifier.json\"\""
     }
   }
 }

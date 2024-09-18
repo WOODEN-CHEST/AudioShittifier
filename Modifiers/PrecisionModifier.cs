@@ -1,5 +1,4 @@
-﻿using AudioShittifier.Audio;
-using NAudio.Wave;
+﻿using NAudio.Wave;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,9 +7,11 @@ using System.Threading.Tasks;
 
 namespace AudioShittifier.Modifiers;
 
+[AudioModifier("precision")]
 public class PrecisionModifier : IAudioModifier
 {
     // Fields.
+    [AudioModifierProperty("step_count")]
     public ulong StepCount
     {
         get => _stepCount;
@@ -27,7 +28,7 @@ public class PrecisionModifier : IAudioModifier
     {
         for (int i = 0; i < buffer.Samples.Length; i++)
         {
-            float ClampedSample = (MathF.Round((buffer.Samples[i] + 1f) * StepCount) / StepCount) - 1f;
+            float ClampedSample = (MathF.Round(buffer.Samples[i] * StepCount) / StepCount);
             buffer.SetSample(i, ClampedSample);
         }
     }

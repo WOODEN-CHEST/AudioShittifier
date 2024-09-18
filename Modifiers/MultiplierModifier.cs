@@ -7,11 +7,12 @@ using System.Threading.Tasks;
 
 namespace AudioShittifier.Modifiers;
 
-public class SampleMultiplier : IAudioModifier
+[AudioModifier("multiply")]
+public class MultiplierModifier : IAudioModifier
 {
     // Fields.
+    [AudioModifierProperty("amount")]
     public float Multiplier { get; set; } = 1f;
-    public float ClippingThreshold { get; set; } = 4f;
 
 
     // Inherited methods.
@@ -19,9 +20,8 @@ public class SampleMultiplier : IAudioModifier
     {
         for (int i = 0; i < buffer.Samples.Length; i++)
         {
-            float ModifiedSample = Math.Abs(buffer.Samples[i] * Multiplier) > ClippingThreshold ? 0f
-                : Math.Clamp(buffer.Samples[i] * Multiplier, -1f, 1f);
-            buffer.Samples[i] = ModifiedSample;
+            float Sample = buffer.Samples[i] * Multiplier;
+            buffer.SetSample(i, Sample);
         }
     }
 }

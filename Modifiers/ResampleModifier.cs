@@ -7,16 +7,20 @@ using System.Threading.Tasks;
 
 namespace AudioShittifier.Modifiers;
 
+/* This doesn't event properly re-sample anything, but the result sounds so bad that I love it. */
+[AudioModifier("resample")]
 public class ResampleModifier : IAudioModifier
 {
     // Fields.
+    [AudioModifierProperty("rate")]
     public int SampleRate
     {
         get => _sampleRate;
         set => _sampleRate = Math.Max(value, 1);
     }
 
-    public ResampleModifierType Type { get; set; } = ResampleModifierType.Interpolate;
+    [AudioModifierProperty("type")]
+    public ResampleModifierType ResampleType { get; set; } = ResampleModifierType.Interpolate;
 
 
 
@@ -37,7 +41,7 @@ public class ResampleModifier : IAudioModifier
         }
     }
 
-    private void InterpolateResample(SampleBuffer buffer)
+    private void Resample(SampleBuffer buffer)
     {
         SampleBuffer BufferCopy = new(buffer.GetCopyOfSamples(), buffer.Format);
         double Precision = Math.Max(1d, (double)buffer.Format.SampleRate / SampleRate);
@@ -47,21 +51,19 @@ public class ResampleModifier : IAudioModifier
             double LowerIndex = Math.Floor(Index / Precision) * Precision;
             double UpperIndex = Math.Floor((Index / Precision) + 1f) * Precision;
             float InterpolationAmount = (float)((Index - LowerIndex) / (UpperIndex - LowerIndex));
+            if (ResampleType == ResampleModifierType.Clamp)
+            {
+                InterpolationAmount = MathF.Round(InterpolationAmount);
+            }
             
             for (int ChannelIndex = 0; ChannelIndex < buffer.Format.Channels; ChannelIndex++)
             {
                 float LowerSample = BufferCopy.GetLerpedSample(LowerIndex, ChannelIndex);
-                float UpperSample = BufferCopy.GetLerpedSample(LowerIndex, ChannelIndex);
+                float UpperSample = BufferCopy.GetLerpedSample(UpperIndex, ChannelIndex);
                 buffer.SetSample(Index, ChannelIndex, LowerSample + ((UpperSample - LowerSample) * InterpolationAmount));
             }
         }
     }
-
-    private void ClampResample(SampleBuffer buffer)
-    {
-
-    }
-
 
     // Inherited methods.
     public void Modify(SampleBuffer buffer)
@@ -71,22 +73,19 @@ public class ResampleModifier : IAudioModifier
             return;
         }
 
-        switch (Type)
+        switch (ResampleType)
         {
             case ResampleModifierType.Interpolate:
-                InterpolateResample(buffer);
-                break;
-
             case ResampleModifierType.Clamp:
-                ClampResample(buffer);
+                Resample(buffer);
                 break;
 
-            case ResampleModifierType.Old:
+            case ResampleModifierType.Legacy:
                 LegacyResample(buffer);
                 break;
 
             default:
-                throw new NotSupportedException($"Resample not supported for resample type {Type} ({(int)Type})");
+                throw new NotSupportedException($"Resample not supported for resample type {ResampleType} ({(int)ResampleType})");
         }
     }
 }

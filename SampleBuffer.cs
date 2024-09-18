@@ -40,7 +40,7 @@ public class SampleBuffer
         {
             return 0.0f;
         }
-        return Samples[index * (channelIndex + 1)];
+        return Samples[index * Format.Channels + channelIndex];
     }
 
     public float GetLerpedSample(double sampleIndex, int channelIndex)
@@ -60,7 +60,7 @@ public class SampleBuffer
             return;
         }
 
-        Samples[sampleIndex * (channelIndex + 1)] = Math.Clamp(value, -1f, 1f);
+        Samples[sampleIndex * Format.Channels + channelIndex] = Math.Clamp(value, -1f, 1f);
     }
 
     public void SetSample(int index, float value)

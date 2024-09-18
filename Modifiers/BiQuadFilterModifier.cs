@@ -8,11 +8,17 @@ using System.Threading.Tasks;
 
 namespace AudioShittifier.Modifiers;
 
-internal class BiQuadFilterModifier : IAudioModifier
+[AudioModifier("biquadfilter")]
+public class BiQuadFilterModifier : IAudioModifier
 {
     // Fields.
+    [AudioModifierProperty("frequency")]
     public int Frequency { get; set; } = 2000;
+
+    [AudioModifierProperty("pass_type")]
     public BiQualFilterPassType PassType { get; set; } = BiQualFilterPassType.HighPass;
+
+    [AudioModifierProperty("filter_order")]
     public int FilterOrder { get; set; } = 3;
 
 

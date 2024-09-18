@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AudioShittifier
+namespace AudioShittifier.Layout;
+
+public interface IModifierLayoutParser
 {
-    internal class ModifierLayoutParser
-    {
-    }
+    ModifierLayout GetLayout(string filePath);
 }

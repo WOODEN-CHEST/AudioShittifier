@@ -7,15 +7,29 @@ using System.Threading.Tasks;
 
 namespace AudioShittifier.Modifiers;
 
+[AudioModifier("waveform")]
 public class WaveformModifier : IAudioModifier
 {
     // Fields.
-    public double ChancePerSecond { get; set; }
+    [AudioModifierProperty("waveforms_per_second")]
+    public double WaveformsPerSecond { get; set; }
+
+    [AudioModifierProperty("min_duration")]
     public TimeSpan MinDuration { get; set; }
+
+    [AudioModifierProperty("max_duration")]
     public TimeSpan MaxDuration { get; set; }
+
+    [AudioModifierProperty("type")]
     public WaveformType WaveType { get; set; } = WaveformType.Sine;
+
+    [AudioModifierProperty("volume")]
     public float Volume { get; set; } = 0.5f;
+
+    [AudioModifierProperty("min_frequency")]
     public float MinFrequency { get; set; } = 300f;
+
+    [AudioModifierProperty("max_frequency")]
     public float MaxFrequency { get; set; } = 3000f;
 
 
@@ -52,18 +66,15 @@ public class WaveformModifier : IAudioModifier
     // Inherited methods.
     public void Modify(SampleBuffer buffer)
     {
-        for (int Index = 0; Index < buffer.LengthPerChannel; Index += buffer.Format.SampleRate)
+        int WaveformCount = (int)(buffer.LengthPerChannel / (double)buffer.Format.SampleRate * WaveformsPerSecond);
+        for (int i = 0; i < WaveformCount; i++)
         {
-            if (Random.Shared.NextDouble() >= ChancePerSecond)
-            {
-                continue;
-            }
+            int SourceIndex = Random.Shared.Next(buffer.LengthPerChannel);
 
-            int SampleCount = (int)(MinDuration.TotalSeconds
-                + ((MaxDuration - MinDuration).TotalSeconds * Random.Shared.NextDouble()));
+            int SampleCount = (int)(MinDuration.TotalSeconds + ((MaxDuration - MinDuration).TotalSeconds 
+                * Random.Shared.NextDouble()) * buffer.Format.SampleRate);
             float Frequency = MinFrequency + ((MaxFrequency - MinFrequency) * Random.Shared.NextSingle());
-            CreateWaveform(buffer, Index, SampleCount, Frequency);
-            Index += SampleCount;
+            CreateWaveform(buffer, SourceIndex, SampleCount, Frequency);
         }
     }
 }

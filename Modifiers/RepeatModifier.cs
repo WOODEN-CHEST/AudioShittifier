@@ -1,5 +1,4 @@
-﻿using AudioShittifier.Audio;
-using NAudio.Wave;
+﻿using NAudio.Wave;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,14 +7,24 @@ using System.Threading.Tasks;
 
 namespace AudioShittifier.Modifiers;
 
+[AudioModifier("repeat")]
 public class RepeatModifier : IAudioModifier
 {
     // Fields.
-    public double RepeatChancePerSecond { get; set; }
+    [AudioModifierProperty("repeats_per_second")]
+    public double RepeatsPerSecond { get; set; }
+
+    [AudioModifierProperty("length_min")]
     public TimeSpan RepeatLengthMin { get; set; }
+
+    [AudioModifierProperty("length_max")]
     public TimeSpan RepeatLengthMax { get; set; }
-    public int RepeatCountMin { get; set; }
-    public int RepeatCountMax { get; set; }
+
+    [AudioModifierProperty("copies_min")]
+    public int CopyCountMin { get; set; }
+
+    [AudioModifierProperty("copies_max")]
+    public int CopyCountMax { get; set; }
 
 
     // Private methods.
@@ -27,11 +36,11 @@ public class RepeatModifier : IAudioModifier
             throw new ArgumentException("destination index and source index create offset which is out of bounds.",
                 nameof(destinationIndex));
         }
-        for (int i = destinationIndex; (i < destinationIndex + count) && (i < buffer.Samples.Length); i++)
+        for (int i = destinationIndex; (i < destinationIndex + count) && (i < buffer.LengthPerChannel); i++)
         {
             for (int ChannelIndex = 0; ChannelIndex < buffer.Format.Channels; ChannelIndex++)
             {
-                buffer.SetSample(i, ChannelIndex, buffer.Samples[i - Offset]);
+                buffer.SetSample(i, ChannelIndex, buffer.GetSample(i - Offset, ChannelIndex));
             }
         }
     }
@@ -40,23 +49,21 @@ public class RepeatModifier : IAudioModifier
     // Inherited methods.
     public void Modify(SampleBuffer buffer)
     {
-        for (int Index = 0; Index < buffer.LengthPerChannel; Index += buffer.Format.SampleRate)
+        /* Technically a buffer copy should be made here to avoid issues,
+         * but the issues make the sound even worse so that's a win. */
+        int TotalRepeatCount = (int)(buffer.LengthPerChannel / (double)buffer.Format.SampleRate * RepeatsPerSecond);
+        for (int i = 0; i < TotalRepeatCount; i++)
         {
-            if (Random.Shared.NextDouble() >= RepeatChancePerSecond)
-            {
-                continue;
-            }
-
-            int RepeatCount = Random.Shared.Next(RepeatCountMin, RepeatCountMax + 1);
+            int CopyCount = Random.Shared.Next(CopyCountMin, CopyCountMax + 1);
             int SamplesInSegment = (int)(RepeatLengthMin.TotalSeconds + 
                 (RepeatLengthMax - RepeatLengthMin).TotalSeconds * Random.Shared.NextDouble() * buffer.Format.SampleRate);
-            int SourceIndex = Index;
-            Index += SamplesInSegment;
+            int SourceIndex = Random.Shared.Next(buffer.LengthPerChannel);
+            int DestinationIndex = SourceIndex + CopyCount;
 
-            for (int RepeatIndex = 0; RepeatIndex < RepeatCount; RepeatIndex++)
+            for (int RepeatIndex = 0; RepeatIndex < CopyCount; RepeatIndex++)
             {
-                CopySamples(buffer, SourceIndex, Index, SamplesInSegment);
-                Index += SamplesInSegment;
+                CopySamples(buffer, SourceIndex, DestinationIndex, SamplesInSegment);
+                DestinationIndex += SamplesInSegment;
             }
         }
     }

@@ -7,10 +7,14 @@ using System.Threading.Tasks;
 
 namespace AudioShittifier.Modifiers;
 
+[AudioModifier("echo")]
 public class EchoModifier : IAudioModifier
 {
     // Fields.
+    [AudioModifierProperty("offset")]
     public TimeSpan Offset { get; set; }
+
+    [AudioModifierProperty("volume")]
     public float EchoVolume { get; set; } = 1f;
 
 
