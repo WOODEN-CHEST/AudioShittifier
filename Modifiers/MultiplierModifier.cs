@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AudioShittifier.Modifiers;
 
-[AudioModifier("multiply")]
+[AudioModifier("multiplier")]
 public class MultiplierModifier : IAudioModifier
 {
     // Fields.

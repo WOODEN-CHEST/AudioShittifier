@@ -10,14 +10,14 @@ namespace AudioShittifier.Modifiers;
 public class ClippingModifier : IAudioModifier
 {
     // Fields.
-    [AudioModifierProperty("clips_per_second")]
+    [AudioModifierProperty("per_second")]
     public double ClipsPerSecond { get; set; }
 
-    [AudioModifierProperty("clip_length_min")]
-    public TimeSpan ClipLengthMin { get; set; }
+    [AudioModifierProperty("duration_min")]
+    public TimeSpan ClipDurationMin { get; set; }
 
-    [AudioModifierProperty("clip_length_max")]
-    public TimeSpan ClipLengthMax { get; set; }
+    [AudioModifierProperty("duration_max")]
+    public TimeSpan ClipDurationMax { get; set; }
 
 
     // Private methods.
@@ -40,8 +40,8 @@ public class ClippingModifier : IAudioModifier
 
         for (int i = 0; i < ClipCount; i++)
         {
-            int SamplesInSegment = (int)(ClipLengthMin.TotalSeconds +
-                (ClipLengthMax - ClipLengthMin).TotalSeconds * Random.Shared.NextDouble() * buffer.Format.SampleRate);
+            int SamplesInSegment = (int)(ClipDurationMin.TotalSeconds +
+                (ClipDurationMax - ClipDurationMin).TotalSeconds * Random.Shared.NextDouble() * buffer.Format.SampleRate);
             ClipSegment(buffer, Random.Shared.Next(buffer.LengthPerChannel), SamplesInSegment);
         }
     }

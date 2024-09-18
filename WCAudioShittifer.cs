@@ -10,6 +10,7 @@ public static class WCAudioShittifier
         try
         {
             Shittifier AudioShittifier = new();
+            AudioShittifier.FileShittify += OnShittifyFileEvent;
             AudioShittifier.Shittify(args);
         }
         catch (ShittifyException e)
@@ -20,5 +21,13 @@ public static class WCAudioShittifier
         {
             Console.WriteLine($"Failed to shittify audio file due to an internal error! {e}");
         }
+    }
+
+
+    // Private static methods.
+    private static void OnShittifyFileEvent(object? sender, ShittifyCompleteEventArgs args)
+    {
+        double ProgressPercent = (double)args.FileNumber / args.MaxFileNumber * 100d;
+        Console.WriteLine($"Shittified \"{Path.GetFileName(args.FilePath)}\" ({ProgressPercent.ToString("0.00")}% done)");
     }
 }

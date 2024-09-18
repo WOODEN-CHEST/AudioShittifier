@@ -11,19 +11,19 @@ namespace AudioShittifier.Modifiers;
 public class RepeatModifier : IAudioModifier
 {
     // Fields.
-    [AudioModifierProperty("repeats_per_second")]
+    [AudioModifierProperty("per_second")]
     public double RepeatsPerSecond { get; set; }
 
-    [AudioModifierProperty("length_min")]
-    public TimeSpan RepeatLengthMin { get; set; }
+    [AudioModifierProperty("duration_min")]
+    public TimeSpan RepeatDurationMin { get; set; }
 
-    [AudioModifierProperty("length_max")]
-    public TimeSpan RepeatLengthMax { get; set; }
+    [AudioModifierProperty("duration_max")]
+    public TimeSpan RepeatDurationMax { get; set; }
 
-    [AudioModifierProperty("copies_min")]
+    [AudioModifierProperty("count_min")]
     public int CopyCountMin { get; set; }
 
-    [AudioModifierProperty("copies_max")]
+    [AudioModifierProperty("count_max")]
     public int CopyCountMax { get; set; }
 
 
@@ -55,8 +55,8 @@ public class RepeatModifier : IAudioModifier
         for (int i = 0; i < TotalRepeatCount; i++)
         {
             int CopyCount = Random.Shared.Next(CopyCountMin, CopyCountMax + 1);
-            int SamplesInSegment = (int)(RepeatLengthMin.TotalSeconds + 
-                (RepeatLengthMax - RepeatLengthMin).TotalSeconds * Random.Shared.NextDouble() * buffer.Format.SampleRate);
+            int SamplesInSegment = (int)(RepeatDurationMin.TotalSeconds + 
+                (RepeatDurationMax - RepeatDurationMin).TotalSeconds * Random.Shared.NextDouble() * buffer.Format.SampleRate);
             int SourceIndex = Random.Shared.Next(buffer.LengthPerChannel);
             int DestinationIndex = SourceIndex + CopyCount;
 

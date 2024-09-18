@@ -11,13 +11,13 @@ namespace AudioShittifier.Modifiers;
 public class WaveformModifier : IAudioModifier
 {
     // Fields.
-    [AudioModifierProperty("waveforms_per_second")]
+    [AudioModifierProperty("per_second")]
     public double WaveformsPerSecond { get; set; }
 
-    [AudioModifierProperty("min_duration")]
+    [AudioModifierProperty("duration_min")]
     public TimeSpan MinDuration { get; set; }
 
-    [AudioModifierProperty("max_duration")]
+    [AudioModifierProperty("duration_max")]
     public TimeSpan MaxDuration { get; set; }
 
     [AudioModifierProperty("type")]
@@ -26,10 +26,10 @@ public class WaveformModifier : IAudioModifier
     [AudioModifierProperty("volume")]
     public float Volume { get; set; } = 0.5f;
 
-    [AudioModifierProperty("min_frequency")]
+    [AudioModifierProperty("frequency_min")]
     public float MinFrequency { get; set; } = 300f;
 
-    [AudioModifierProperty("max_frequency")]
+    [AudioModifierProperty("frequency_max")]
     public float MaxFrequency { get; set; } = 3000f;
 
 

@@ -1,10 +1,4 @@
 ﻿using GHEngine.IO.JSON;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Nodes;
-using System.Threading.Tasks;
 
 namespace AudioShittifier.Layout;
 
@@ -24,14 +18,14 @@ public class JSONModifierLayoutParser : IModifierLayoutParser
             return new ModifierLayout(new ModifierDefinition[] { ParseSingleModifier(Compound) });
             
         }
-        if (parsedJsonObject is JsonArray ModifierArray)
+        if (parsedJsonObject is JSONList ModifierArray)
         {
             return new ModifierLayout(ParseModifierArray(ModifierArray));
         }
-        throw new ModifierParseException("Expected compound as modifier root");
+        throw new ModifierParseException("Expected compound or list as modifier root");
     }
 
-    private ModifierDefinition[] ParseModifierArray(JsonArray array)
+    private ModifierDefinition[] ParseModifierArray(JSONList array)
     {
         List<ModifierDefinition> Definitions = new();
         foreach (object? Item in array)
@@ -78,7 +72,7 @@ public class JSONModifierLayoutParser : IModifierLayoutParser
         {
             return GetRangeProvider(Compound);
         }
-        if (value is JsonArray SelectionArray)
+        if (value is JSONList SelectionArray)
         {
             return GetSelectionProvider(key, SelectionArray);
         }
@@ -93,7 +87,7 @@ public class JSONModifierLayoutParser : IModifierLayoutParser
         return new NumberRangeValueProvider(Best, Worst);
     }
 
-    private IValueProvider GetSelectionProvider(string key, JsonArray array)
+    private IValueProvider GetSelectionProvider(string key, JSONList array)
     {
         object?[] ObjArray = array.ToArray();
         if (ObjArray.Length == 0)

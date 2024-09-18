@@ -11,7 +11,7 @@ namespace AudioShittifier.Modifiers;
 public class PrecisionModifier : IAudioModifier
 {
     // Fields.
-    [AudioModifierProperty("step_count")]
+    [AudioModifierProperty("steps")]
     public ulong StepCount
     {
         get => _stepCount;

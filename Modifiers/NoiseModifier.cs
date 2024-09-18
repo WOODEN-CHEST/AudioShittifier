@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 
 namespace AudioShittifier.Modifiers;
 
+[AudioModifier("noise")]
 public class NoiseModifier : IAudioModifier
 {
     // Fields.
-    [AudioModifierProperty("noise_amount")]
+    [AudioModifierProperty("amount")]
     public double PortionOfSamplesWithNoise { get; set; } = 0.0001d;
 
 
@@ -22,7 +23,7 @@ public class NoiseModifier : IAudioModifier
         for (int i = 0; i < SamplesRandomized; i++)
         {
             int Index = Random.Shared.Next(0, buffer.LengthPerChannel);
-            for (int ChannelIndex = 0; ChannelIndex < buffer.LengthPerChannel; ChannelIndex++)
+            for (int ChannelIndex = 0; ChannelIndex < buffer.Format.Channels; ChannelIndex++)
             {
                 buffer.SetSample(Index, ChannelIndex, Random.Shared.NextSingle() * 2f - 1f);
             }

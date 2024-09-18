@@ -3,6 +3,7 @@ using AudioShittifier.Modifiers;
 using NAudio.Wave;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,15 +12,15 @@ namespace AudioShittifier;
 
 public class Shittifier
 {
+    // Fields.
+    public event EventHandler<ShittifyCompleteEventArgs> FileShittify;
+
     // Private static fields.
     private const string TARGET_FILE_EXTENSION = ".mp3";
 
 
     // Constructors.
-    public Shittifier()
-    {
-
-    }
+    public Shittifier() { }
 
 
     // Methods.
@@ -96,7 +97,7 @@ public class Shittifier
 
     private ModifierLayout GetDefaultModifierLayout()
     {
-        throw new NotImplementedException();
+        return new ModifierLayout(new ModifierDefinition[] { });
     }
 
     private ModifierLayout GetModifierLayout(string? layoutPath)
@@ -119,6 +120,8 @@ public class Shittifier
 
     private void ShittifyFiles(IEnumerable<string> filePaths, string outputDir, double intensity, ModifierLayout layout)
     {
+        int Index = 1;
+        int FilePathCount = filePaths.Count();
         foreach (string FilePath in filePaths)
         {
             SampleBuffer Buffer = ReadAudioFile(FilePath);
@@ -139,6 +142,8 @@ public class Shittifier
 
             string Destination = Path.Combine(outputDir, Path.GetFileName(FilePath));
             WriteAudioFile(Destination, Buffer);
+            FileShittify?.Invoke(this, new(FilePath, Index, FilePathCount));
+            Index++;
         }
     }
 

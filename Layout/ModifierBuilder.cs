@@ -72,7 +72,7 @@ public class ModifierBuilder
         {
             return TimeSpan.FromSeconds(Convert.ToDouble(value));
         }
-        catch (Exception e)
+        catch (Exception)
         {
             throw new ModifierBuildException($"Expected timespan seconds for property \"{propertyName}\"");
         }

@@ -15,10 +15,10 @@ public class BiQuadFilterModifier : IAudioModifier
     [AudioModifierProperty("frequency")]
     public int Frequency { get; set; } = 2000;
 
-    [AudioModifierProperty("pass_type")]
+    [AudioModifierProperty("type")]
     public BiQualFilterPassType PassType { get; set; } = BiQualFilterPassType.HighPass;
 
-    [AudioModifierProperty("filter_order")]
+    [AudioModifierProperty("order")]
     public int FilterOrder { get; set; } = 3;
 
 
