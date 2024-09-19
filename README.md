@@ -1,5 +1,5 @@
 # Audio shittifier
-Do you ever hear a nice, high-quality song and think to yourself "the quality of this song is just TOO good"?
+Do you ever hear a nice, high-quality song and think that the quality of this song is just too good?
 Well, worry no more, audio shittifier is here to save the day (if you get it working, that is).
 
 ## What does it do?
