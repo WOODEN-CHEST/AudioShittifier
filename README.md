@@ -101,3 +101,85 @@ All options in a selection value must be of the same type.
 ```
 "parameter": [1, 5, 10, 20, 50, 100]
 ```
+
+If a parameter is not set in the layout, then the audio shittifier uses a default value. This means any and all parameters can be omitted if you do not wish to change them.
+Multiple effects with the same type can be defined, allowing to have the same effect applied multiple times.
+
+
+## Effect documentation.
+Below you'll find the list of effects and their parameters.
+
+### "biquadfilter"
+Performs either a low frequency pass or high frequency pass operation on the audio.
+"frequency" (integer) -The target frequency of the biquadfilter's operation
+"type" (string) -The type of pass that is done, can be either "LowPass" or "HighPass"
+"order" (integer) -The filter's order. Best not to set this.
+
+### "clipping"
+"Clips" the audio, making it cut out at random times.
+"per_second" (real number) -The number of clips per second on average
+"duration_min" (real number) -The minimum duratioin (in seconds) of a cutout.
+"duration_max" (real number) -The maximum duratioin (in seconds) of a cutout.
+
+### "echo"
+Plays another instance of the audio over the current audio
+"offset" (real number) -The offset of the played audio (in seconds).
+"volume" (real number) -The volume multiplier of the played audio.
+
+### "mono"
+Averages all tracks in the audio.
+
+### "multiplier"
+Multiplies the audio samples by a value (changes the volume).
+"amount" (real number) -The multiplier
+
+### "noise"
+Introduces random noise into the audio
+"amount" (real number) -The portion of audio that should be random noise.
+
+### "power"
+Takes each sample of the audio to the given power. It makes it so that, if the "amount" parameter is set high, the peaks in audio become louder and the lows lower.
+If set low, then the audio simply becomes louder.
+"amount" (real number) -The power to which to take the samples, if set to 1 then nothing changes about the audio.
+
+### "precision"
+Changes the precision of the audio samples.
+"steps" (integer) -The amount of steps that the sample may take from 0 to reach the maximum / minimum sample value.
+
+### "repeat"
+Repeats parts of the audio.
+"per_second" (real number) -The number of repeats per second on average.
+"duration_min" (real number) -The minimum duration (in seconds) of a repeated section.
+"duration_max" (real number) -The maximum duration (in seconds) of a repeated section.
+"count_min" (integer) -The minimum number of section copies made in a repeat.
+"count_max" (integer) -The maximum number of section copies made in a repeat.
+
+### "resample"
+Resamples the audio at a different sample rate.
+"rate" (integer) The target sample-rate to resample to.
+
+### "swap"
+Swaps sections of the audio.
+"per_second" (real number) -The number of swaps per second on average.
+"duration_min" (real number) -The minimum duration (in seconds) of a swapped section.
+"duration_max" (real number) -The maximum duration (in seconds) of a swapped section.
+
+### "waveform"
+Replaces parts of the audio with constant waveforms into the audio.
+"per_second" (real number) -The number of waveforms per second on average.
+"duration_min" (real number) -The minimum duration (in seconds) of a waveform.
+"duration_max" (real number) -The maximum duration (in seconds) of a waveform.
+"type" (string) -The type of a waveform. May be "Sine", "Square", "Saw" or "Triangle"
+"volume" (real number) -The volume of the waveform (multiplier)
+"frequency_min" (real number) -The minimum frequency (Hz) of the waveform
+"frequency_max" (real number) -The maximum frequency (Hz) of the waveform
+
+
+## Some notes.
+The program is fairly poorly made, so it can be buggy.
+The order in which filters are applied depends on the order in which they are defined in the layout file.
+The program is a memory hog, especially on larger audio files, may use up to 2GB of memory on normal length songs.
+The program likely won't work on 30+ minute long audio files as those will use too much memory, sorry.
+
+
+
