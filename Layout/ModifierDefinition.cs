@@ -34,12 +34,12 @@ public class ModifierDefinition
         return _values.ContainsKey(name ?? throw new ArgumentNullException(nameof(name)));
     }
 
-    public object? GetValue(string name, double intensity)
+    public object? GetValue(string name)
     {
         ArgumentNullException.ThrowIfNull(name, nameof(name));
         if (_values.TryGetValue(name, out IValueProvider? ValueProvider))
         {
-            return ValueProvider.GetValue(intensity);
+            return ValueProvider.GetValue();
         }
         return null;
     }

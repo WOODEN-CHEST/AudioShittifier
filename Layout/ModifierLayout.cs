@@ -19,6 +19,26 @@ public class ModifierLayout
             throw new ArgumentException("Modifiers array contains null", nameof(modifiers));
         }
         _modifierDefinitions = modifiers.ToArray();
+        VerifyLayout();
+    }
+
+
+    // Private fields.
+    private void VerifyLayout()
+    {
+        ModifierBuilder Builder = new();
+        try
+        {
+            foreach (ModifierDefinition Def in _modifierDefinitions)
+            {
+                Builder.GetModifier(Def); // If the layout is invalid, the build will fail.
+            }
+        }
+        catch (ModifierBuildException e)
+        {
+            throw new ModifierLayoutException($"Invalid layout: {e.Message}");
+        }
+        
     }
 
 
@@ -35,7 +55,7 @@ public class ModifierLayout
             int UsedIndex = Random.Shared.Next(AvailableModifiers.Count);
             try
             {
-                AudioModifiers.Add(Builder.GetModifier(AvailableModifiers[UsedIndex], intensity));
+                AudioModifiers.Add(Builder.GetModifier(AvailableModifiers[UsedIndex]));
             }
             catch (ModifierBuildException e)
             {

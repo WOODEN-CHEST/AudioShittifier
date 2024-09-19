@@ -20,7 +20,7 @@ public class MultiSelectionValueProvider : IValueProvider
 
 
     // Inherited methods.
-    public object GetValue(double intensity)
+    public object GetValue()
     {
         return _choices[Random.Shared.Next(_choices.Length)];
     }

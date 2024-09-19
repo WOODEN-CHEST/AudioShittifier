@@ -13,13 +13,33 @@ public class BiQuadFilterModifier : IAudioModifier
 {
     // Fields.
     [AudioModifierProperty("frequency")]
-    public int Frequency { get; set; } = 2000;
+    public int Frequency
+    {
+        get => _frequency;
+        set => _frequency = Math.Clamp(value, FREQUENCY_MIN, FREQUENCY_MAX);
+    }
 
     [AudioModifierProperty("type")]
     public BiQualFilterPassType PassType { get; set; } = BiQualFilterPassType.HighPass;
 
     [AudioModifierProperty("order")]
-    public int FilterOrder { get; set; } = 3;
+    public int FilterOrder
+    {
+        get => _filterOrder;
+        set => _filterOrder = Math.Clamp(value, FILTER_ORDER_MIN, FILTER_ORDER_MAX);
+    }
+
+    // Private static fields.
+    private const int FREQUENCY_MIN = 0;
+    private const int FREQUENCY_MAX = 192000;
+    private const int FREQUENCY_DEFAULT = 22050;
+    private const int FILTER_ORDER_MIN = 0;
+    private const int FILTER_ORDER_MAX = 20;
+    private const int FILTER_ORDER_DEFAULT = 3;
+
+    // Private fields.
+    private int _frequency = FREQUENCY_DEFAULT;
+    private int _filterOrder = FILTER_ORDER_DEFAULT;
 
 
     // Inherited methods.

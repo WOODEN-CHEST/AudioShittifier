@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,7 +13,21 @@ public class MultiplierModifier : IAudioModifier
 {
     // Fields.
     [AudioModifierProperty("amount")]
-    public float Multiplier { get; set; } = 1f;
+    public float Multiplier
+    {
+        get => _multiplier;
+        set => _multiplier = float.IsNaN(value) ? MULTIPLIER_DEFAULT
+            : Math.Clamp(value, MULTIPLIER_MIN, MULTIPLIER_MAX);
+    }
+
+    // Private static fields.
+    private const float MULTIPLIER_DEFAULT = 1f;
+    private const float MULTIPLIER_MIN = 0f;
+    private const float MULTIPLIER_MAX = 10_000f;
+
+
+    // Private fields.
+    private float _multiplier = MULTIPLIER_DEFAULT;
 
 
     // Inherited methods.

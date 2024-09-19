@@ -82,8 +82,11 @@ public class JSONModifierLayoutParser : IModifierLayoutParser
 
     private IValueProvider GetRangeProvider(JSONCompound compound)
     {
-        double Best = compound.GetVerified<double>(KEY_RANGE_BEST);
-        double Worst = compound.GetVerified<double>(KEY_RANGE_WORST);
+        double Best = compound.Get(KEY_RANGE_BEST, out long BestLong) ?
+            BestLong : compound.GetVerified<double>(KEY_RANGE_BEST);
+        double Worst = compound.Get(KEY_RANGE_WORST, out long WorstLong) ?
+            WorstLong : compound.GetVerified<double>(KEY_RANGE_WORST);
+
         return new NumberRangeValueProvider(Best, Worst);
     }
 
@@ -127,6 +130,10 @@ public class JSONModifierLayoutParser : IModifierLayoutParser
         catch (JSONEntryException e)
         {
             throw new ModifierParseException($"Failed to parse modifier due to an invalid layout. {e.Message}");
+        }
+        catch (ModifierLayoutException e)
+        {
+            throw new ModifierParseException(e.Message);
         }
     }
 }

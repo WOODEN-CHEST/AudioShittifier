@@ -15,7 +15,22 @@ public class EchoModifier : IAudioModifier
     public TimeSpan Offset { get; set; }
 
     [AudioModifierProperty("volume")]
-    public float EchoVolume { get; set; } = 1f;
+    public float EchoVolume
+    {
+        get => _echoVolume;
+        set => _echoVolume = float.IsNaN(value) ? ECHO_VOLUME_DEFAULT
+            : Math.Clamp(value, ECHO_VOLUME_MIN, ECHO_VOLUME_MAX);
+    }
+
+
+    // Private static fields.
+    private const float ECHO_VOLUME_DEFAULT = 1f;
+    private const float ECHO_VOLUME_MAX = 10_000f;
+    private const float ECHO_VOLUME_MIN = 0f;
+
+
+    // Private fields.
+    private float _echoVolume = ECHO_VOLUME_DEFAULT;
 
 
     // Inherited methods.

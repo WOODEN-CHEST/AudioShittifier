@@ -15,12 +15,16 @@ public class PrecisionModifier : IAudioModifier
     public ulong StepCount
     {
         get => _stepCount;
-        set => _stepCount = Math.Max(value, 1);
+        set => _stepCount = Math.Max(value, STEP_COUNT_MIN);
     }
+
+    // Private static fields.
+    private const ulong STEP_COUNT_DEFAULT = 4_294_967_296uL;
+    private const ulong STEP_COUNT_MIN = 1uL;
 
 
     // Private fields.
-    private ulong _stepCount = (ulong)Math.Pow(2, 32);
+    private ulong _stepCount = STEP_COUNT_DEFAULT;
 
 
     // Inherited methods.
@@ -28,7 +32,7 @@ public class PrecisionModifier : IAudioModifier
     {
         for (int i = 0; i < buffer.Samples.Length; i++)
         {
-            float ClampedSample = (MathF.Round(buffer.Samples[i] * StepCount) / StepCount);
+            float ClampedSample = (float)(Math.Round((double)buffer.Samples[i] * StepCount) / (double)StepCount);
             buffer.SetSample(i, ClampedSample);
         }
     }

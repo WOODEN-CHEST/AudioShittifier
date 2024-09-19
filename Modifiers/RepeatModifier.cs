@@ -12,7 +12,15 @@ public class RepeatModifier : IAudioModifier
 {
     // Fields.
     [AudioModifierProperty("per_second")]
-    public double RepeatsPerSecond { get; set; }
+    public double RepeatsPerSecond
+    {
+        get => _repeatsPerSecond;
+        set
+        {
+            _repeatsPerSecond = double.IsNaN(value) ? REPEATS_PER_SECOND_DEFAULT
+                : Math.Clamp(value, REPEATS_PER_SECOND_MIN, REPEATS_PER_SECOND_MAX);
+        }
+    }
 
     [AudioModifierProperty("duration_min")]
     public TimeSpan RepeatDurationMin { get; set; }
@@ -21,10 +29,41 @@ public class RepeatModifier : IAudioModifier
     public TimeSpan RepeatDurationMax { get; set; }
 
     [AudioModifierProperty("count_min")]
-    public int CopyCountMin { get; set; }
+    public int CopyCountMin
+    {
+        get => _copyCountMin;
+        set
+        {
+            _copyCountMin = Math.Clamp(value, COPY_COUNT_MIN, COPY_COUNT_MAX);
+            _copyCountMax = Math.Max(_copyCountMin, _copyCountMax);
+        }
+    }
 
     [AudioModifierProperty("count_max")]
-    public int CopyCountMax { get; set; }
+    public int CopyCountMax
+    {
+        get => _copyCountMax;
+        set
+        {
+            _copyCountMax = Math.Clamp(value, COPY_COUNT_MIN, COPY_COUNT_MAX);
+            _copyCountMin = Math.Min(_copyCountMin, _copyCountMax);
+        }
+    }
+
+
+    // Private static fields.
+    private const double REPEATS_PER_SECOND_DEFAULT = 0d;
+    private const double REPEATS_PER_SECOND_MAX = 10_000;
+    private const double REPEATS_PER_SECOND_MIN = 0;
+    private const int COPY_COUNT_MIN = 0;
+    private const int COPY_COUNT_MAX = 10_000;
+    private const int COPY_COUNT_DEFAULT = 0;
+
+
+    // Private fields.
+    private double _repeatsPerSecond = REPEATS_PER_SECOND_DEFAULT;
+    private int _copyCountMin = COPY_COUNT_MIN;
+    private int _copyCountMax = COPY_COUNT_MAX;
 
 
     // Private methods.

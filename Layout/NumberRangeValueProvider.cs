@@ -22,8 +22,8 @@ public class NumberRangeValueProvider : IValueProvider
 
 
     // Inherited methods.
-    public object GetValue(double intensity)
+    public object GetValue()
     {
-        return _bestValue + ((_worstValue - _bestValue) * intensity);
+        return _bestValue + ((_worstValue - _bestValue) * Random.Shared.NextDouble());
     }
 }

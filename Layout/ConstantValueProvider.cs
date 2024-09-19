@@ -20,7 +20,7 @@ public class ConstantValueProvider : IValueProvider
 
 
     // Inherited methods.
-    public object GetValue(double intensity)
+    public object GetValue()
     {
         return _value;
     }

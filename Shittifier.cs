@@ -27,15 +27,10 @@ public class Shittifier
     public void Shittify(string[] programArgs)
     { 
         ShittifierArguments ParsedArguments = ReadArguments(programArgs);
-        if (!Path.IsPathFullyQualified(ParsedArguments.SourceFilePath))
-        {
-            throw new ShittifyException(
-                $"Source file or directory path \"{ParsedArguments.SourceFilePath}\" is not fully qualified");
-        }
-        IEnumerable<string> FilesToShittify = GetFilesToShittify(ParsedArguments.SourceFilePath);
-        string Destionation = GetDestinationDirecotry(ParsedArguments.DestinationDirectory, ParsedArguments.SourceFilePath);
-        ShittifyFiles(FilesToShittify, Destionation, ParsedArguments.Intensity, 
-            GetModifierLayout(ParsedArguments.LayoutPath));
+        string[] FilesToShittify = GetFilesToShittify(ParsedArguments.SourceFilePath);
+        Directory.CreateDirectory(ParsedArguments.DestinationDirectory);
+        ModifierLayout Layout = GetModifierLayout(ParsedArguments.LayoutPath);
+        ShittifyFiles(FilesToShittify, ParsedArguments.DestinationDirectory, ParsedArguments.Intensity, Layout);
     }
 
 
@@ -52,23 +47,23 @@ public class Shittifier
         }
     }
 
-    private IEnumerable<string> GetFilesToShittify(string sourcePath)
+    private string[] GetFilesToShittify(string sourcePath)
     {
-        List<string> FilesToShittify = new();
+        string[] FilesToShittify;
         if (File.Exists(sourcePath))
         {
-            FilesToShittify.Add(sourcePath);
+            FilesToShittify = new string[] { sourcePath };
         }
         else if (Directory.Exists(sourcePath))
         {
-            FilesToShittify.AddRange(Directory.GetFiles(sourcePath, $"*{TARGET_FILE_EXTENSION}", SearchOption.AllDirectories));
+            FilesToShittify = Directory.GetFiles(sourcePath, $"*{TARGET_FILE_EXTENSION}", SearchOption.AllDirectories);
         }
         else
         {
             throw new ShittifyException("Source path does not exist.");
         }
 
-        if (FilesToShittify.Count == 0)
+        if (FilesToShittify.Length == 0)
         {
             throw new ShittifyException("No files found to shittify with the given path.");
         }
@@ -76,35 +71,16 @@ public class Shittifier
         return FilesToShittify;
     }
 
-    private string GetDestinationDirecotry(string? destinationDirectory, string? sourceDirectory)
-    {
-        string FinalDirectory;
-        if (destinationDirectory == null)
-        {
-            FinalDirectory = Path.Combine(Path.GetDirectoryName(sourceDirectory) ?? string.Empty, "out");
-        }
-        else if (!Path.IsPathFullyQualified(destinationDirectory))
-        {
-            throw new ShittifyException($"Destination directory \"{destinationDirectory}\" is not fully qualified");
-        }
-        else
-        {
-            FinalDirectory = destinationDirectory;
-        }
-        Directory.CreateDirectory(FinalDirectory);
-        return FinalDirectory;
-    }
-
     private ModifierLayout GetDefaultModifierLayout()
     {
-        return new ModifierLayout(new ModifierDefinition[] { });
+        return new ModifierLayout(Array.Empty<ModifierDefinition>());
     }
 
     private ModifierLayout GetModifierLayout(string? layoutPath)
     {
         if (layoutPath == null)
         {
-            return GetDefaultModifierLayout();
+            throw new ShittifyException("No layout provided, can't shittify file.");
         }
 
         try
@@ -118,12 +94,11 @@ public class Shittifier
         }
     }
 
-    private void ShittifyFiles(IEnumerable<string> filePaths, string outputDir, double intensity, ModifierLayout layout)
+    private void ShittifyFiles(string[] filePaths, string outputDir, double intensity, ModifierLayout layout)
     {
-        int Index = 1;
-        int FilePathCount = filePaths.Count();
-        foreach (string FilePath in filePaths)
+        for (int i = 0; i < filePaths.Length; i++)
         {
+            string FilePath = filePaths[i];
             SampleBuffer Buffer = ReadAudioFile(FilePath);
             IAudioModifier[] Modifiers;
             try
@@ -142,8 +117,7 @@ public class Shittifier
 
             string Destination = Path.Combine(outputDir, Path.GetFileName(FilePath));
             WriteAudioFile(Destination, Buffer);
-            FileShittify?.Invoke(this, new(FilePath, Index, FilePathCount));
-            Index++;
+            FileShittify?.Invoke(this, new(FilePath, i + 1, filePaths.Length));
         }
     }
 
@@ -157,6 +131,7 @@ public class Shittifier
 
     private void WriteAudioFile(string path, SampleBuffer buffer)
     {
+        File.Delete(path);
         SampleToWaveConverter Converter = new(buffer.Format, buffer.Samples);
         MediaFoundationEncoder.EncodeToMp3(Converter, path);
     }

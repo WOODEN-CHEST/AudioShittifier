@@ -16,16 +16,21 @@ public class ResampleModifier : IAudioModifier
     public int SampleRate
     {
         get => _sampleRate;
-        set => _sampleRate = Math.Max(value, 1);
+        set => _sampleRate = Math.Clamp(value, SAMPLE_RATE_MIN, SAMPLE_RATE_MAX);
     }
 
     [AudioModifierProperty("type")]
     public ResampleModifierType ResampleType { get; set; } = ResampleModifierType.Interpolate;
 
 
+    // Private static fields.
+    private const int SAMPLE_RATE_DEFAULT = 44100;
+    private const int SAMPLE_RATE_MAX = 192000;
+    private const int SAMPLE_RATE_MIN = 1;
+
 
     // Private fields.
-    private int _sampleRate = 44100;
+    private int _sampleRate = SAMPLE_RATE_DEFAULT;
 
 
     // Private methods.

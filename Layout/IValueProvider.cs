@@ -8,5 +8,5 @@ namespace AudioShittifier.Layout;
 
 public interface IValueProvider
 {
-    object GetValue(double intensity);
+    object GetValue();
 }

@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Globalization;
+
 
 namespace AudioShittifier;
+
 
 public record class ShittifierArguments
 {
@@ -19,7 +16,7 @@ public record class ShittifierArguments
     // Fields.
     public string SourceFilePath { get; private set; }
     public string DestinationDirectory { get; private set; }
-    public float Intensity { get; private set; } = 0.2f;
+    public double Intensity { get; private set; } = 1d;
     public string? LayoutPath { get; private set; } = null;
 
 
@@ -36,6 +33,7 @@ public record class ShittifierArguments
         {
             throw new ShittifierArgumentException($"Missing source directory.");
         }
+        DestinationDirectory ??= Path.Combine(Path.GetDirectoryName(SourceFilePath)!, "out");
     }
 
 
@@ -60,27 +58,62 @@ public record class ShittifierArguments
         }
     }
 
+    private void SetSourceFilePath(string value)
+    {
+        SourceFilePath = value.Replace("\"", string.Empty);
+        if (!Path.IsPathFullyQualified(SourceFilePath))
+        {
+            throw new ShittifierArgumentException(
+                $"Source file or directory path \"{SourceFilePath}\" is not fully qualified");
+        }
+    }
+
+    private void SetDestinationFilePath(string value)
+    {
+        DestinationDirectory = value.Replace("\"", string.Empty);
+        if (!Path.IsPathFullyQualified(DestinationDirectory))
+        {
+            throw new ShittifierArgumentException(
+                $"Destination directory path \"{value}\" is not fully qualified");
+        }
+    }
+
+    private void SetLayoutPath(string value)
+    {
+        LayoutPath = value.Replace("\"", string.Empty);
+        if (!Path.IsPathFullyQualified(LayoutPath))
+        {
+            throw new ShittifierArgumentException(
+                $"Layout path \"{value}\" is not fully qualified");
+        }
+    }
+
+    private void SetIntensity(string value)
+    {
+        if (double.TryParse(value, CultureInfo.InvariantCulture, out double Result))
+        {
+            Intensity = double.IsNaN(Result) ? Intensity : Math.Clamp(Result, 0d, 1d);
+        }
+        else
+        {
+            throw new ShittifierArgumentException($"Expected number for intensity: \"{value}\"");
+        }
+    }
+
     private void ParseSingleArgument(string key, string value)
     {
         switch (key)
         {
             case ARG_SOURCE:
-                SourceFilePath = value;
+                SetSourceFilePath(value);
                 break;
 
             case ARG_DEST:
-                DestinationDirectory = value;
+                SetDestinationFilePath(value);
                 break;
 
             case ARG_INTENSITY:
-                if (float.TryParse(value, CultureInfo.InvariantCulture, out float Result))
-                {
-                    Intensity = Result;
-                }
-                else
-                {
-                    throw new ShittifierArgumentException($"Expected number for intensity: \"{value}\"");
-                }
+                SetIntensity(value);
                 break;
 
             case ARG_LAYOUT:

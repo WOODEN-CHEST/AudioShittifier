@@ -8,10 +8,10 @@ namespace AudioShittifier.Layout;
 public class ModifierBuilder
 {
     // Methods.
-    public IAudioModifier GetModifier(ModifierDefinition definition, double intensity)
+    public IAudioModifier GetModifier(ModifierDefinition definition)
     {
         object Modifier = GetModifierFromTypeName(definition.Name);
-        ApplyPropertiesFromDefinition(Modifier, definition, intensity);
+        ApplyPropertiesFromDefinition(Modifier, definition);
         return (IAudioModifier)Modifier;
     }
 
@@ -148,11 +148,11 @@ public class ModifierBuilder
                 return CastedObject;
             }
         }
-        throw new ModifierBuildException($"Invalid type for modifier property \"{propertyName}\"." +
+        throw new ModifierBuildException($"Invalid type for modifier property \"{propertyName}\". " +
             $"Expected {targetType.Name}, got {value.GetType().Name}");
     }
 
-    private void ApplyPropertiesFromDefinition(object modifier, ModifierDefinition definition, double intensity)
+    private void ApplyPropertiesFromDefinition(object modifier, ModifierDefinition definition)
     {
         foreach (PropertyInfo Property in GetModifiableProperties(modifier.GetType()))
         {
@@ -164,7 +164,7 @@ public class ModifierBuilder
                 continue;
             }
 
-            object? Value = TryConvertValue(definition.GetValue(TargetAttribute.PropertyName, intensity)!,
+            object? Value = TryConvertValue(definition.GetValue(TargetAttribute.PropertyName)!,
                 Property.PropertyType, TargetAttribute.PropertyName);
             Property.SetValue(modifier, Value);
         }
