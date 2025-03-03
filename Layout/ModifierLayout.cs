@@ -1,4 +1,5 @@
 ﻿using AudioShittifier.Modifiers;
+using System.Collections;
 
 
 namespace AudioShittifier.Layout;
@@ -41,27 +42,35 @@ public class ModifierLayout
         
     }
 
+    private int[] GetIndexes(int count, int unusedIndexCount)
+    {
+        List<int> IndexList = new(Enumerable.Range(0, count));
+        for (int i = 0; i < unusedIndexCount; i++)
+        {
+            IndexList.RemoveAt(Random.Shared.Next(IndexList.Count));
+        }
+        return IndexList.ToArray();
+    }
+
 
     // Methods.
     public IAudioModifier[] GetModifiers(double intensity)
     {
-        int MaxModifiers = Math.Clamp((int)Math.Round(intensity * _modifierDefinitions.Length), 0, _modifierDefinitions.Length);
-        List<ModifierDefinition> AvailableModifiers = new(_modifierDefinitions);
+        int UnusedModifierCount = _modifierDefinitions.Length -
+            Math.Clamp((int)Math.Round(intensity * _modifierDefinitions.Length), 0, _modifierDefinitions.Length);
         List<IAudioModifier> AudioModifiers = new();
         ModifierBuilder Builder = new();
 
-        for (int i = 0; i < MaxModifiers; i++)
+        foreach (int Index in GetIndexes(_modifierDefinitions.Length, UnusedModifierCount))
         {
-            int UsedIndex = Random.Shared.Next(AvailableModifiers.Count);
             try
             {
-                AudioModifiers.Add(Builder.GetModifier(AvailableModifiers[UsedIndex]));
+                AudioModifiers.Add(Builder.GetModifier(_modifierDefinitions[Index]));
             }
             catch (ModifierBuildException e)
             {
                 throw new ModifierLayoutException($"Failed to build modifier for layout: {e.Message}");
             }
-            AvailableModifiers.RemoveAt(UsedIndex);
         }
 
         return AudioModifiers.ToArray();

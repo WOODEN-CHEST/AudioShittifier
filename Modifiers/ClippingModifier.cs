@@ -24,6 +24,7 @@ public class ClippingModifier : IAudioModifier
     [AudioModifierProperty("duration_max")]
     public TimeSpan ClipDurationMax { get; set; }
 
+
     // Private static fields.
     private const double CLIPS_PER_SECOND_MIN = 0d;
     private const double CLIPS_PER_SECOND_MAX = 10_000d;

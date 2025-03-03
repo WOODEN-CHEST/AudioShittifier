@@ -40,7 +40,7 @@ public static class WCAudioShittifier
     private static void PrintUsage()
     {
         Console.WriteLine("Usage: Pass arguments with <key>=<value> where <key> is the name of the argument" +
-            " and <value> is it's value.\n" +
+            " and <value> is its value.\n" +
             "Available arguments:\n" +
             "    source=<string> -The source directory or file path which contains the file(s) to shittify.\n" +
             "    destination=<string> -The destination directory path in which to place the shittified files, may be omitted.\n" +
